@@ -130,16 +130,6 @@ footer{text-align:center;color:var(--mu);font-size:.85rem;margin-top:28px}
   </ul>
 </section>
 
-<section class="cen">
-  <h2>📱 Escaneá y llevátela en el celular</h2>
-  <p class="lead">Primero compartí tu página para que cualquiera pueda abrirla. Después pegá acá el link y tocá “Generar QR”.</p>
-  <input id="qurl" type="url" inputmode="url" value="https://claude.ai/artifact/4qF8ByRTEhcrJYB8nMiUKk" aria-label="Link de la página">
-  <button id="qgo">Generar QR</button>
-  <div><div id="qr"></div></div>
-  <p class="lead">Mantené apretada la imagen del QR para guardarla o sacale captura para imprimirlo en tu cartel.</p>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-</section>
-
 <footer>Proyecto para la Feria de Ciencias · Materia: Inglés<br>Autores: Rafael Garmendia, Said Gutierrez y Ulises Palencia · 4to 1ra · TECEL<br>Los datos del simulador son ficticios.</footer>
 </main>
 
@@ -255,14 +245,6 @@ F.forEach(function(f){
 });
 var fr=document.createElement("p");fr.id="fres";fr.style.fontWeight="700";fb.appendChild(fr);
 
-function mkqr(){
-  var u=$("qurl").value.trim();
-  $("qr").innerHTML="";
-  if(!u||typeof QRCode==="undefined"){$("qr").textContent="No se pudo generar el QR.";return}
-  new QRCode($("qr"),{text:u,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
-}
-$("qgo").onclick=mkqr;
-mkqr();
 })();
 </script>
 </body>
