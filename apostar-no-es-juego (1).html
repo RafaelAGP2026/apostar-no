@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La casa siempre gana</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f4ef;--card:#fff;--tx:#1d1d1f;--mu:#5f6368;--ac:#c0392b;--ok:#1e8449;--bd:#e3dfd6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--card:#1f2226;--tx:#f1f1f1;--mu:#a0a6ad;--ac:#ff6b5b;--ok:#4cd187;--bd:#33373d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#1f2226;--tx:#f1f1f1;--mu:#a0a6ad;--ac:#ff6b5b;--ok:#4cd187;--bd:#33373d;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55}
+main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+header{text-align:center;padding:40px 0 20px}
+h1{font-size:clamp(2rem,7vw,3.2rem);margin:0 0 8px;line-height:1.1}
+h1 span{color:var(--ac)}
+h2{margin:0 0 12px;font-size:1.5rem}
+.sub{color:var(--mu);font-size:1.1rem;margin:0}
+section{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:22px;margin-top:22px}
+.facts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.fact{border:1px solid var(--bd);border-radius:12px;padding:14px}
+.fact b{display:block;font-size:1.05rem;margin-bottom:4px}
+.fact p{margin:0;color:var(--mu);font-size:.95rem}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:12px 18px;background:var(--ac);color:#fff;font-weight:600}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.alt{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+.reels{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.reel{width:76px;height:86px;border:2px solid var(--bd);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2.6rem;background:var(--bg)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;margin:10px 0}
+.stats div{border:1px solid var(--bd);border-radius:10px;padding:8px}
+.stats small{display:block;color:var(--mu);font-size:.8rem}
+.stats strong{font-size:1.25rem}
+#msg{text-align:center;min-height:3em;font-weight:600}
+.bad{color:var(--ac)}.good{color:var(--ok)}
+.bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
+.opts{display:grid;gap:8px;margin:12px 0}
+.opt{text-align:left;background:var(--bg);color:var(--tx);border:1px solid var(--bd);font-weight:500}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,transparent)}
+.opt.wrong{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 18%,transparent)}
+#exp{padding:12px;border-radius:10px;background:var(--bg);margin-bottom:12px}
+.hid{display:none}
+.help{border-left:4px solid var(--ok);padding-left:14px}
+ul{padding-left:20px;margin:8px 0}
+.cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.vc{min-height:92px;text-align:center;background:var(--bg);color:var(--tx);border:1px solid var(--bd);font-weight:500;padding:10px}
+.vc b{display:block;font-size:1.15rem;color:var(--ac)}
+.vc small{display:block;color:var(--mu);font-weight:400;margin-top:4px}
+.phr{margin:10px 0 0;padding:0;list-style:none}
+.phr li{padding:8px 12px;border:1px solid var(--bd);border-radius:10px;margin-bottom:6px}
+.phr em{color:var(--mu)}
+input{font:inherit;font-size:16px;width:100%;padding:12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);margin:8px 0}
+#qr{display:inline-block;background:#fff;padding:12px;border-radius:12px;margin:10px 0}
+.cen{text-align:center}
+.lead{color:var(--mu);margin:0 0 12px}
+button{min-height:46px}
+@media (max-width:480px){main{padding:12px 10px 50px}section{padding:16px}header{padding:26px 0 10px}.reel{width:64px;height:74px;font-size:2.2rem}.opt{padding:14px}}
+footer{text-align:center;color:var(--mu);font-size:.85rem;margin-top:28px}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>La casa <span>siempre gana</span></h1>
+  <p class="sub">Apostar no es un juego: es un negocio donde vos ponés la plata y ellos ponen las reglas.</p>
+  <p class="sub" style="margin-top:6px"><b>🇬🇧 English:</b> Don’t bet on it! Learn the key words.</p>
+  <p class="sub" style="margin-top:14px;font-size:.95rem">✏️ Hecho por <b>Rafael Garmendia</b>, <b>Said Gutierrez</b> y <b>Ulises Palencia</b><br>4to 1ra · TECEL</p>
+</header>
+
+<section>
+  <h2>🎯 ¿Por qué no conviene apostar?</h2>
+  <div class="facts">
+    <div class="fact"><b>📉 Las matemáticas no mienten</b><p>Todo juego de apuestas está diseñado para que, a largo plazo, el que pierde sea el jugador.</p></div>
+    <div class="fact"><b>🧠 Te engañan los sentidos</b><p>Luces, sonidos y “casi ganás” hacen que tu cerebro quiera seguir jugando aunque estés perdiendo.</p></div>
+    <div class="fact"><b>🔁 Perseguir pérdidas</b><p>“Una más y recupero” es la trampa más común: cada intento suele aumentar la pérdida.</p></div>
+    <div class="fact"><b>💔 Afecta a todos</b><p>Puede generar deudas, estrés, problemas familiares y adicción, también en adolescentes.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>🎰 Probá vos mismo (con plata falsa)</h2>
+  <p class="sub">Empezás con $1000 virtuales. Cada tirada cuesta $100. Mirá cuánto aguantás.</p>
+  <div class="reels" aria-live="polite"><div class="reel" id="r0">🍒</div><div class="reel" id="r1">🍋</div><div class="reel" id="r2">🔔</div></div>
+  <div class="stats">
+    <div><small>Saldo</small><strong id="bal">$1000</strong></div>
+    <div><small>Apostado</small><strong id="bet">$0</strong></div>
+    <div><small>Tiradas</small><strong id="spins">0</strong></div>
+  </div>
+  <p id="msg"></p>
+  <div style="text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+    <button id="spin">Tirar ($100)</button>
+    <button class="alt" id="reset">Reiniciar</button>
+  </div>
+</section>
+
+<section>
+  <h2>📝 Cuestionario: ¿qué tanto sabés?</h2>
+  <div class="bar"><i id="pb"></i></div>
+  <div id="quiz"></div>
+</section>
+
+<section>
+  <h2>🇬🇧 English corner: words to know</h2>
+  <p class="lead">Tocá cada tarjeta para ver la traducción y un ejemplo.</p>
+  <div class="cards" id="cards"></div>
+  <h3 style="margin:18px 0 6px">Phrases to say “no”</h3>
+  <ul class="phr">
+    <li>“No, thanks. I don’t gamble.” <em>(No, gracias. Yo no apuesto.)</em></li>
+    <li>“It’s not worth the risk.” <em>(No vale la pena el riesgo.)</em></li>
+    <li>“I need help.” <em>(Necesito ayuda.)</em></li>
+    <li>“You can talk to me.” <em>(Podés hablar conmigo.)</em></li>
+  </ul>
+</section>
+
+<section>
+  <h2>✍️ Complete the sentence</h2>
+  <p class="lead">Elegí la palabra correcta en inglés.</p>
+  <div id="fill"></div>
+</section>
+
+<section class="help">
+  <h2>🤝 Si vos o alguien cercano necesita ayuda</h2>
+  <ul>
+    <li>Hablá con un adulto de confianza, un familiar o un docente.</li>
+    <li>En Argentina podés llamar a la <b>Línea 141</b> de Sedronar, gratuita, por consumos problemáticos y adicciones.</li>
+    <li>Existen grupos de apoyo como Jugadores Anónimos.</li>
+    <li>Pedir ayuda no es debilidad: es la mejor jugada.</li>
+  </ul>
+</section>
+
+<section class="cen">
+  <h2>📱 Escaneá y llevátela en el celular</h2>
+  <p class="lead">Primero compartí tu página para que cualquiera pueda abrirla. Después pegá acá el link y tocá “Generar QR”.</p>
+  <input id="qurl" type="url" inputmode="url" value="https://claude.ai/artifact/4qF8ByRTEhcrJYB8nMiUKk" aria-label="Link de la página">
+  <button id="qgo">Generar QR</button>
+  <div><div id="qr"></div></div>
+  <p class="lead">Mantené apretada la imagen del QR para guardarla o sacale captura para imprimirlo en tu cartel.</p>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</section>
+
+<footer>Proyecto para la Feria de Ciencias · Materia: Inglés<br>Autores: Rafael Garmendia, Said Gutierrez y Ulises Palencia · 4to 1ra · TECEL<br>Los datos del simulador son ficticios.</footer>
+</main>
+
+<script>
+(function(){
+var SYM=["🍒","🍋","🔔","⭐","7️⃣"];
+var bal=1000,bet=0,sp=0,busy=false;
+var $=function(i){return document.getElementById(i)};
+function upd(){$("bal").textContent="$"+bal;$("bet").textContent="$"+bet;$("spins").textContent=sp;$("spin").disabled=busy||bal<100}
+function rnd(){return SYM[Math.floor(Math.random()*SYM.length)]}
+$("spin").onclick=function(){
+  if(bal<100||busy)return;
+  busy=true;bal-=100;bet+=100;sp++;$("msg").textContent="";upd();
+  var n=0,t=setInterval(function(){
+    for(var i=0;i<3;i++)$("r"+i).textContent=rnd();
+    if(++n>10){clearInterval(t);end()}
+  },80);
+};
+function end(){
+  var win=Math.random()<0.2,res;
+  if(win){res=SYM[Math.floor(Math.random()*SYM.length)];for(var i=0;i<3;i++)$("r"+i).textContent=res;bal+=300;
+    $("msg").innerHTML='<span class="good">¡Ganaste $300! Se siente genial… ¿seguís?</span>'}
+  else{var a=rnd(),b=rnd(),c=rnd();
+    if(a===b&&b===c)c=SYM[(SYM.indexOf(c)+1)%SYM.length];
+    if(Math.random()<0.4){b=a}
+    $("r0").textContent=a;$("r1").textContent=b;$("r2").textContent=c;
+    $("msg").innerHTML='<span class="bad">Perdiste $100.'+(a===b?' ¡Casi! (Es un truco: “casi ganar” también es perder.)':'')+'</span>'}
+  busy=false;upd();
+  if(bal<100)$("msg").innerHTML+='<br>💸 Te quedaste sin saldo tras '+sp+' tiradas. En la vida real, esto sería plata de verdad.';
+}
+$("reset").onclick=function(){bal=1000;bet=0;sp=0;busy=false;$("msg").textContent="";upd()};
+upd();
+
+var Q=[
+{q:"En los juegos de azar, ¿quién tiene ventaja a largo plazo?",o:["El jugador con suerte","La casa de apuestas","Depende del día"],a:1,e:"Los juegos están diseñados con una ventaja matemática para la casa. Algunos ganan, pero la mayoría pierde."},
+{q:"Perdiste varias veces seguidas. ¿Es más probable que ahora ganes?",o:["Sí, ya te toca","No, cada jugada es independiente","Sí, si apostás más"],a:1,e:"Es la “falacia del jugador”: el azar no tiene memoria. Cada tirada tiene la misma probabilidad que la anterior."},
+{q:"¿Qué es “perseguir las pérdidas”?",o:["Jugar para recuperar lo perdido","Dejar de jugar","Apostar poco"],a:0,e:"Seguir apostando para recuperar lo perdido suele llevar a perder todavía más y es señal de alerta."},
+{q:"Una señal de que el juego se volvió un problema es…",o:["Mentir sobre cuánto se juega","Jugar solo con amigos","Perder una vez"],a:0,e:"Ocultar o mentir sobre el juego, pedir plata prestada o descuidar otras cosas son señales de alerta."},
+{q:"Las luces y sonidos de los juegos de apuestas sirven para…",o:["Que sea más divertido nomás","Mantenerte jugando más tiempo","Avisarte que ganaste siempre"],a:1,e:"Están pensados para estimular el cerebro y hacer que sea difícil parar."},
+{q:"Si un amigo tiene problemas con las apuestas, lo mejor es…",o:["Prestarle plata","Ignorarlo","Escucharlo sin juzgar y acercarlo a ayuda"],a:2,e:"El apoyo sin juicio y buscar ayuda profesional o de un adulto de confianza puede marcar la diferencia."}
+];
+var i=0,score=0,box=$("quiz");
+function show(){
+  $("pb").style.width=(i/Q.length*100)+"%";
+  if(i>=Q.length){
+    var m=score>=5?"¡Excelente! Ya sos un/a experto/a en prevención.":score>=3?"¡Bien! Compartí lo que aprendiste con tus amigos.":"Repasá la página y volvé a intentarlo. ¡Lo importante es informarse!";
+    box.innerHTML='<h3>Tu puntaje: '+score+' / '+Q.length+'</h3><p>'+m+'</p><button id="again">Repetir cuestionario</button>';
+    $("again").onclick=function(){i=0;score=0;show()};return}
+  var q=Q[i];
+  box.innerHTML='<p><b>Pregunta '+(i+1)+' de '+Q.length+'</b></p><p>'+q.q+'</p><div class="opts"></div><div id="exp" class="hid"></div><button id="next" class="hid">'+(i===Q.length-1?"Ver resultado":"Siguiente")+'</button>';
+  var ob=box.querySelector(".opts");
+  q.o.forEach(function(t,k){
+    var b=document.createElement("button");b.className="opt";b.textContent=t;
+    b.onclick=function(){
+      var all=ob.children;
+      for(var j=0;j<all.length;j++){all[j].disabled=true}
+      all[q.a].classList.add("right");
+      if(k===q.a){score++}else{b.classList.add("wrong")}
+      var e=$("exp");e.classList.remove("hid");e.textContent=(k===q.a?"✅ ¡Correcto! ":"❌ Incorrecto. ")+q.e;
+      $("next").classList.remove("hid");
+    };
+    ob.appendChild(b);
+  });
+  $("next").onclick=function(){i++;show()};
+}
+show();
+
+var V=[
+["gambling","apuestas / juego de azar","Gambling can become an addiction."],
+["bet","apostar / apuesta","He made a bet and lost."],
+["addiction","adicción","Addiction is an illness, not a weakness."],
+["luck","suerte","Winning is luck, not skill."],
+["risk","riesgo","It’s not worth the risk."],
+["debt","deuda","Gambling can lead to debt."],
+["odds","probabilidades","The odds are always against you."],
+["to lose","perder","Most players lose money."],
+["to quit","dejar (un hábito)","It’s never too late to quit."],
+["support","apoyo","Ask your family for support."]
+];
+var cb=$("cards");
+V.forEach(function(w){
+  var b=document.createElement("button");b.className="vc";b.innerHTML="<b>"+w[0]+"</b>";
+  var on=false;
+  b.onclick=function(){on=!on;b.innerHTML=on?"<b>"+w[1]+"</b><small>“"+w[2]+"”</small>":"<b>"+w[0]+"</b>"};
+  cb.appendChild(b);
+});
+
+var F=[
+["Most people ___ money when they gamble.",["lose","win","save"],0,"Lose = perder. La mayoría pierde plata."],
+["The ___ are always against the player.",["prizes","odds","friends"],1,"Odds = probabilidades."],
+["Gambling can lead to ___.",["homework","holidays","debt"],2,"Debt = deuda."],
+["If you have a problem, ask for ___.",["support","a bet","luck"],0,"Support = apoyo."],
+["Winning a bet is just ___, not skill.",["practice","luck","talent"],1,"Luck = suerte."]
+];
+var fb=$("fill"),fs=0,fd=0;
+F.forEach(function(f){
+  var d=document.createElement("div");d.style.marginBottom="16px";
+  d.innerHTML="<p><b>"+f[0]+"</b></p><div class=\"opts\"></div><div class=\"fx\"></div>";
+  var o=d.querySelector(".opts"),x=d.querySelector(".fx");
+  f[1].forEach(function(t,k){
+    var b=document.createElement("button");b.className="opt";b.textContent=t;
+    b.onclick=function(){
+      var a=o.children;for(var j=0;j<a.length;j++)a[j].disabled=true;
+      a[f[2]].classList.add("right");
+      if(k===f[2]){fs++}else{b.classList.add("wrong")}
+      x.textContent=(k===f[2]?"✅ Correct! ":"❌ Not quite. ")+f[3];
+      fd++;
+      if(fd===F.length){$("fres").textContent="Score / Puntaje: "+fs+" / "+F.length}
+    };
+    o.appendChild(b);
+  });
+  fb.appendChild(d);
+});
+var fr=document.createElement("p");fr.id="fres";fr.style.fontWeight="700";fb.appendChild(fr);
+
+function mkqr(){
+  var u=$("qurl").value.trim();
+  $("qr").innerHTML="";
+  if(!u||typeof QRCode==="undefined"){$("qr").textContent="No se pudo generar el QR.";return}
+  new QRCode($("qr"),{text:u,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
+}
+$("qgo").onclick=mkqr;
+mkqr();
+})();
+</script>
+</body>
+</html>
