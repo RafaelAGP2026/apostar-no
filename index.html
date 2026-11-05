@@ -11,6 +11,7 @@
 :root[data-theme="dark"]{--bg:#15171a;--card:#1f2226;--tx:#f1f1f1;--mu:#a0a6ad;--ac:#ff6b5b;--ok:#4cd187;--bd:#33373d;color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55}
 main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
 header{text-align:center;padding:40px 0 20px}
@@ -52,22 +53,58 @@ ul{padding-left:20px;margin:8px 0}
 .phr li{padding:8px 12px;border:1px solid var(--bd);border-radius:10px;margin-bottom:6px}
 .phr em{color:var(--mu)}
 input{font:inherit;font-size:16px;width:100%;padding:12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);margin:8px 0}
-#qr{display:inline-block;background:#fff;padding:12px;border-radius:12px;margin:10px 0}
 .cen{text-align:center}
 .lead{color:var(--mu);margin:0 0 12px}
 button{min-height:46px}
-@media (max-width:480px){main{padding:12px 10px 50px}section{padding:16px}header{padding:26px 0 10px}.reel{width:64px;height:74px;font-size:2.2rem}.opt{padding:14px}}
+
+/* Ingreso con nombre */
+#gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+#gate .box{max-width:420px;width:100%;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:26px 22px;text-align:center}
+#gate h2{margin:6px 0 8px}
+#gerr{color:var(--ac);min-height:1.5em;font-weight:600;font-size:.95rem;margin:2px 0 8px}
+
+/* Jugador y puntajes */
+.pbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 12px}
+.pbar button{min-height:36px;padding:6px 12px;font-size:.9rem}
+.qpts{color:var(--ok);font-weight:700}
+.big{font-size:2.2rem;font-weight:800;color:var(--ok);margin:0}
+.rank{width:100%;border-collapse:collapse;font-size:.95rem}
+.rank th,.rank td{padding:8px 6px;border-bottom:1px solid var(--bd);text-align:center}
+.rank th{color:var(--mu);font-size:.8rem;font-weight:600}
+.rank td.nm{text-align:left;word-break:break-word}
+.rank tr.me{background:color-mix(in srgb,var(--ok) 16%,transparent);font-weight:700}
+.rank td.tot{font-weight:700}
+
+@media (max-width:480px){main{padding:12px 10px 50px}section{padding:16px}header{padding:26px 0 10px}.reel{width:64px;height:74px;font-size:2.2rem}.opt{padding:14px}.rank{font-size:.85rem}.rank th,.rank td{padding:7px 3px}}
 footer{text-align:center;color:var(--mu);font-size:.85rem;margin-top:28px}
 </style>
 </head>
 <body>
-<main>
+
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gt">
+  <form class="box" id="gf" autocomplete="off" novalidate>
+    <div style="font-size:2.4rem" aria-hidden="true">🎰</div>
+    <h2 id="gt">¿Cómo te llamás?</h2>
+    <p class="lead">Escribí tu nombre o apodo para entrar y guardar tu puntaje en el ranking.</p>
+    <input id="gname" type="text" maxlength="20" placeholder="Tu nombre" aria-label="Tu nombre" autocomplete="off">
+    <p id="gerr" role="alert"></p>
+    <button type="submit" style="width:100%">Entrar</button>
+    <p class="lead" style="font-size:.85rem;margin:12px 0 0">Usá un nombre respetuoso: no se permiten malas palabras.</p>
+  </form>
+</div>
+
+<main id="app" hidden>
 <header>
   <h1>La casa <span>siempre gana</span></h1>
   <p class="sub">Apostar no es un juego: es un negocio donde vos ponés la plata y ellos ponen las reglas.</p>
   <p class="sub" style="margin-top:6px"><b>🇬🇧 English:</b> Don’t bet on it! Learn the key words.</p>
   <p class="sub" style="margin-top:14px;font-size:.95rem">✏️ Hecho por <b>Rafael Garmendia</b>, <b>Said Gutierrez</b> y <b>Ulises Palencia</b><br>4to 1ra · TECEL</p>
 </header>
+
+<div class="pbar">
+  <span>👤 Jugador: <b id="pname"></b> · 🏆 <b id="ptot">0</b> pts</span>
+  <button class="alt" id="chg" type="button">Cambiar jugador</button>
+</div>
 
 <section>
   <h2>🎯 ¿Por qué no conviene apostar?</h2>
@@ -97,6 +134,7 @@ footer{text-align:center;color:var(--mu);font-size:.85rem;margin-top:28px}
 
 <section>
   <h2>📝 Cuestionario: ¿qué tanto sabés?</h2>
+  <p class="lead">Cada respuesta correcta suma <b>100 puntos</b> + hasta <b>50 de bonus</b> por responder rápido (máximo 900).</p>
   <div class="bar"><i id="pb"></i></div>
   <div id="quiz"></div>
 </section>
@@ -116,8 +154,14 @@ footer{text-align:center;color:var(--mu);font-size:.85rem;margin-top:28px}
 
 <section>
   <h2>✍️ Complete the sentence</h2>
-  <p class="lead">Elegí la palabra correcta en inglés.</p>
+  <p class="lead">Elegí la palabra correcta en inglés. Cada acierto suma <b>100 puntos</b> (máximo 500).</p>
   <div id="fill"></div>
+</section>
+
+<section>
+  <h2>🏆 Ranking</h2>
+  <p class="lead">Suma de tu mejor puntaje en el cuestionario y en English. Se guarda en este dispositivo.</p>
+  <div id="rank"></div>
 </section>
 
 <section class="help">
@@ -135,9 +179,138 @@ footer{text-align:center;color:var(--mu);font-size:.85rem;margin-top:28px}
 
 <script>
 (function(){
+var $=function(i){return document.getElementById(i)};
+
+/*FILTER-START*/
+function norm(s){
+  s=String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  s=s.replace(/0/g,"o").replace(/1/g,"i").replace(/3/g,"e").replace(/4/g,"a")
+     .replace(/5/g,"s").replace(/7/g,"t").replace(/@/g,"a").replace(/\$/g,"s").replace(/!/g,"i");
+  return s.replace(/[^a-z]+/g," ").trim();
+}
+function sq(s){return s.replace(/(.)\1+/g,"$1")}
+/* Se buscan dentro de cada palabra */
+var SUB=["boludo","boluda","boludez","pelotud","pendej","mierda","concha","conchud","forro","poronga",
+"sorete","mogolic","mongolic","retrasad","imbecil","idiota","estupid","cagon","cagar","garcha",
+"pajero","chupapija","maricon","hitler","porno","cornudo","hijueputa","gonorrea","malparid"].map(sq);
+/* Tienen que ser la palabra completa (para no bloquear apellidos como Vergara u Ortolani) */
+var WORD=["puto","puta","putos","putas","putita","putito","pito","pija","pijas","verga","vergas","choto","chota",
+"culo","culos","culiado","culiao","orto","ortiba","paja","pajas","trolo","trola","tarado","tarada",
+"bolu","marica","maricas","hdp","ctm","lpm","lcdtm","csm","nazi","sexo","sex","mrd","cojudo"].map(sq);
+/* Frases (se buscan aunque estén separadas con espacios) */
+var PHR=["putamadre","hijodeput","hijoputa","hijadeput","lamadre","tumadre","chupala","vetealacagar","andatealacagar"].map(sq);
+function isBad(s){
+  var n=norm(s);
+  if(!n)return false;
+  var raw=n.split(" "),toks=[],run="",k,j;
+  for(k=0;k<raw.length;k++){
+    if(raw[k].length===1){run+=raw[k]}
+    else{if(run){toks.push(run);run=""}toks.push(raw[k])}
+  }
+  if(run)toks.push(run);
+  toks=toks.map(sq);
+  var compact=sq(n.replace(/ /g,""));
+  for(j=0;j<PHR.length;j++){if(compact.indexOf(PHR[j])>=0)return true}
+  for(k=0;k<toks.length;k++){
+    if(WORD.indexOf(toks[k])>=0)return true;
+    for(j=0;j<SUB.length;j++){if(toks[k].indexOf(SUB[j])>=0)return true}
+  }
+  return false;
+}
+function checkName(raw){
+  var name=String(raw||"").replace(/\s+/g," ").trim();
+  var letters=name.match(/\p{L}/gu);
+  if(!letters||letters.length<2)return{err:"Escribí un nombre de al menos 2 letras."};
+  if(!/^[\p{L}\p{N}][\p{L}\p{N} .'\-]*$/u.test(name))return{err:"Usá solo letras, números y espacios."};
+  if(isBad(name))return{err:"Ese nombre no está permitido. Elegí un nombre o apodo respetuoso 🙏"};
+  var key=name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  return{name:name,key:key};
+}
+/*FILTER-END*/
+
+/* ===== Almacenamiento del ranking ===== */
+var KEY="casa_ranking_v1",memDB={};
+function load(){
+  try{var r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&typeof r==="object"){memDB=r;return r}}catch(e){}
+  return memDB;
+}
+function save(d){memDB=d;try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
+function list(){
+  var db=load(),a=[],k,r;
+  for(k in db){
+    if(!Object.prototype.hasOwnProperty.call(db,k))continue;
+    r=db[k];
+    if(!r||typeof r.name!=="string"||isBad(r.name))continue;
+    a.push({key:k,name:r.name.slice(0,20),quiz:+r.quiz||0,fill:+r.fill||0,t:+r.t||0,tot:(+r.quiz||0)+(+r.fill||0)});
+  }
+  a.sort(function(x,y){return y.tot-x.tot||x.t-y.t});
+  return a;
+}
+var player=null;
+function record(field,val){
+  var db=load(),r=db[player.key]||{name:player.name,quiz:0,fill:0,t:0};
+  r.name=player.name;
+  if(val>(+r[field]||0))r[field]=val;
+  r.t=Date.now();
+  db[player.key]=r;save(db);
+  updTotal();renderRank();
+}
+function position(){
+  var a=list(),i;
+  for(i=0;i<a.length;i++){if(a[i].key===player.key)return{pos:i+1,of:a.length}}
+  return{pos:0,of:a.length};
+}
+function updTotal(){
+  var db=load(),r=db[player.key];
+  $("ptot").textContent=r?(+r.quiz||0)+(+r.fill||0):0;
+}
+function renderRank(){
+  var box=$("rank"),a=list();
+  box.textContent="";
+  if(!a.length){var p=document.createElement("p");p.className="lead";p.textContent="Todavía no hay puntajes. ¡Sé el primero!";box.appendChild(p);return}
+  var t=document.createElement("table");t.className="rank";
+  var h=t.createTHead().insertRow();
+  ["#","Jugador","Cuestionario","English","Total"].forEach(function(x){var th=document.createElement("th");th.textContent=x;h.appendChild(th)});
+  var tb=t.createTBody(),medals=["🥇","🥈","🥉"];
+  function row(r,i){
+    var tr=tb.insertRow();if(player&&r.key===player.key)tr.className="me";
+    var c=tr.insertCell();c.textContent=i<3?medals[i]:String(i+1);
+    c=tr.insertCell();c.className="nm";c.textContent=r.name;
+    c=tr.insertCell();c.textContent=r.quiz;
+    c=tr.insertCell();c.textContent=r.fill;
+    c=tr.insertCell();c.className="tot";c.textContent=r.tot;
+  }
+  var i,mi=-1;
+  for(i=0;i<a.length;i++){if(player&&a[i].key===player.key)mi=i}
+  for(i=0;i<Math.min(10,a.length);i++)row(a[i],i);
+  if(mi>=10)row(a[mi],mi);
+  box.appendChild(t);
+}
+
+/* ===== Ingreso con nombre ===== */
+function openGate(){
+  $("gate").hidden=false;$("app").hidden=true;
+  $("gname").value="";$("gerr").textContent="";
+  document.body.style.overflow="hidden";
+  setTimeout(function(){$("gname").focus()},50);
+}
+$("gname").addEventListener("input",function(){$("gerr").textContent=""});
+$("gf").addEventListener("submit",function(e){
+  e.preventDefault();
+  var r=checkName($("gname").value);
+  if(r.err){$("gerr").textContent=r.err;return}
+  player=r;
+  $("pname").textContent=player.name;
+  $("gate").hidden=true;$("app").hidden=false;
+  document.body.style.overflow="";
+  window.scrollTo(0,0);
+  startSession();
+});
+$("chg").onclick=function(){player=null;openGate()};
+
+/* ===== Simulador ===== */
 var SYM=["🍒","🍋","🔔","⭐","7️⃣"];
 var bal=1000,bet=0,sp=0,busy=false;
-var $=function(i){return document.getElementById(i)};
 function upd(){$("bal").textContent="$"+bal;$("bet").textContent="$"+bet;$("spins").textContent=sp;$("spin").disabled=busy||bal<100}
 function rnd(){return SYM[Math.floor(Math.random()*SYM.length)]}
 $("spin").onclick=function(){
@@ -163,6 +336,7 @@ function end(){
 $("reset").onclick=function(){bal=1000;bet=0;sp=0;busy=false;$("msg").textContent="";upd()};
 upd();
 
+/* ===== Cuestionario con puntaje ===== */
 var Q=[
 {q:"En los juegos de azar, ¿quién tiene ventaja a largo plazo?",o:["El jugador con suerte","La casa de apuestas","Depende del día"],a:1,e:"Los juegos están diseñados con una ventaja matemática para la casa. Algunos ganan, pero la mayoría pierde."},
 {q:"Perdiste varias veces seguidas. ¿Es más probable que ahora ganes?",o:["Sí, ya te toca","No, cada jugada es independiente","Sí, si apostás más"],a:1,e:"Es la “falacia del jugador”: el azar no tiene memoria. Cada tirada tiene la misma probabilidad que la anterior."},
@@ -171,32 +345,43 @@ var Q=[
 {q:"Las luces y sonidos de los juegos de apuestas sirven para…",o:["Que sea más divertido nomás","Mantenerte jugando más tiempo","Avisarte que ganaste siempre"],a:1,e:"Están pensados para estimular el cerebro y hacer que sea difícil parar."},
 {q:"Si un amigo tiene problemas con las apuestas, lo mejor es…",o:["Prestarle plata","Ignorarlo","Escucharlo sin juzgar y acercarlo a ayuda"],a:2,e:"El apoyo sin juicio y buscar ayuda profesional o de un adulto de confianza puede marcar la diferencia."}
 ];
-var i=0,score=0,box=$("quiz");
+var i=0,score=0,qPts=0,qStart=0,box=$("quiz");
 function show(){
   $("pb").style.width=(i/Q.length*100)+"%";
   if(i>=Q.length){
     var m=score>=5?"¡Excelente! Ya sos un/a experto/a en prevención.":score>=3?"¡Bien! Compartí lo que aprendiste con tus amigos.":"Repasá la página y volvé a intentarlo. ¡Lo importante es informarse!";
-    box.innerHTML='<h3>Tu puntaje: '+score+' / '+Q.length+'</h3><p>'+m+'</p><button id="again">Repetir cuestionario</button>';
-    $("again").onclick=function(){i=0;score=0;show()};return}
+    record("quiz",qPts);
+    var ps=position();
+    box.innerHTML='<div class="cen"><p class="sub">Tu puntaje</p><p class="big">'+qPts+' pts</p><p>Respuestas correctas: <b>'+score+' / '+Q.length+'</b></p><p>'+m+'</p>'+
+      (ps.pos?'<p>🏆 Estás en el puesto <b>'+ps.pos+'</b> de '+ps.of+' en el ranking.</p>':'')+
+      '<button id="again">Repetir cuestionario</button></div>';
+    $("again").onclick=function(){i=0;score=0;qPts=0;show()};return}
   var q=Q[i];
-  box.innerHTML='<p><b>Pregunta '+(i+1)+' de '+Q.length+'</b></p><p>'+q.q+'</p><div class="opts"></div><div id="exp" class="hid"></div><button id="next" class="hid">'+(i===Q.length-1?"Ver resultado":"Siguiente")+'</button>';
+  box.innerHTML='<p><b>Pregunta '+(i+1)+' de '+Q.length+'</b> · ⭐ <span class="qpts" id="qp">'+qPts+'</span> pts</p><p>'+q.q+'</p><div class="opts"></div><div id="exp" class="hid"></div><button id="next" class="hid">'+(i===Q.length-1?"Ver resultado":"Siguiente")+'</button>';
   var ob=box.querySelector(".opts");
+  qStart=Date.now();
   q.o.forEach(function(t,k){
     var b=document.createElement("button");b.className="opt";b.textContent=t;
     b.onclick=function(){
-      var all=ob.children;
+      var all=ob.children,gain=0,bonus=0;
       for(var j=0;j<all.length;j++){all[j].disabled=true}
       all[q.a].classList.add("right");
-      if(k===q.a){score++}else{b.classList.add("wrong")}
-      var e=$("exp");e.classList.remove("hid");e.textContent=(k===q.a?"✅ ¡Correcto! ":"❌ Incorrecto. ")+q.e;
+      if(k===q.a){
+        score++;
+        bonus=Math.max(0,Math.round(50-((Date.now()-qStart)/1000)*5));
+        gain=100+bonus;qPts+=gain;
+        $("qp").textContent=qPts;
+      }else{b.classList.add("wrong")}
+      var e=$("exp");e.classList.remove("hid");
+      e.textContent=(k===q.a?"✅ ¡Correcto! +"+gain+" pts (100 + "+bonus+" de bonus por rapidez). ":"❌ Incorrecto. +0 pts. ")+q.e;
       $("next").classList.remove("hid");
     };
     ob.appendChild(b);
   });
   $("next").onclick=function(){i++;show()};
 }
-show();
 
+/* ===== English: tarjetas ===== */
 var V=[
 ["gambling","apuestas / juego de azar","Gambling can become an addiction."],
 ["bet","apostar / apuesta","He made a bet and lost."],
@@ -217,6 +402,7 @@ V.forEach(function(w){
   cb.appendChild(b);
 });
 
+/* ===== English: completar la frase con puntaje ===== */
 var F=[
 ["Most people ___ money when they gamble.",["lose","win","save"],0,"Lose = perder. La mayoría pierde plata."],
 ["The ___ are always against the player.",["prizes","odds","friends"],1,"Odds = probabilidades."],
@@ -224,27 +410,45 @@ var F=[
 ["If you have a problem, ask for ___.",["support","a bet","luck"],0,"Support = apoyo."],
 ["Winning a bet is just ___, not skill.",["practice","luck","talent"],1,"Luck = suerte."]
 ];
-var fb=$("fill"),fs=0,fd=0;
-F.forEach(function(f){
-  var d=document.createElement("div");d.style.marginBottom="16px";
-  d.innerHTML="<p><b>"+f[0]+"</b></p><div class=\"opts\"></div><div class=\"fx\"></div>";
-  var o=d.querySelector(".opts"),x=d.querySelector(".fx");
-  f[1].forEach(function(t,k){
-    var b=document.createElement("button");b.className="opt";b.textContent=t;
-    b.onclick=function(){
-      var a=o.children;for(var j=0;j<a.length;j++)a[j].disabled=true;
-      a[f[2]].classList.add("right");
-      if(k===f[2]){fs++}else{b.classList.add("wrong")}
-      x.textContent=(k===f[2]?"✅ Correct! ":"❌ Not quite. ")+f[3];
-      fd++;
-      if(fd===F.length){$("fres").textContent="Score / Puntaje: "+fs+" / "+F.length}
-    };
-    o.appendChild(b);
+var fb=$("fill");
+function buildFill(){
+  var fs=0,fd=0;
+  fb.textContent="";
+  var fr=document.createElement("div");fr.id="fres";fr.className="cen";fr.style.fontWeight="700";
+  F.forEach(function(f){
+    var d=document.createElement("div");d.style.marginBottom="16px";
+    d.innerHTML="<p><b>"+f[0]+"</b></p><div class=\"opts\"></div><div class=\"fx\"></div>";
+    var o=d.querySelector(".opts"),x=d.querySelector(".fx");
+    f[1].forEach(function(t,k){
+      var b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=function(){
+        var a=o.children;for(var j=0;j<a.length;j++)a[j].disabled=true;
+        a[f[2]].classList.add("right");
+        if(k===f[2]){fs++}else{b.classList.add("wrong")}
+        x.textContent=(k===f[2]?"✅ Correct! +100 pts. ":"❌ Not quite. +0 pts. ")+f[3];
+        fd++;
+        if(fd===F.length){
+          record("fill",fs*100);
+          fr.textContent="Score / Puntaje: "+fs+" / "+F.length+" · "+(fs*100)+" pts";
+          var rb=document.createElement("button");rb.className="alt";rb.textContent="Try again / Repetir";rb.style.marginLeft="10px";
+          rb.onclick=buildFill;fr.appendChild(document.createElement("br"));fr.appendChild(rb);
+        }
+      };
+      o.appendChild(b);
+    });
+    fb.appendChild(d);
   });
-  fb.appendChild(d);
-});
-var fr=document.createElement("p");fr.id="fres";fr.style.fontWeight="700";fb.appendChild(fr);
+  fb.appendChild(fr);
+}
 
+/* ===== Inicio de sesión de cada jugador ===== */
+function startSession(){
+  i=0;score=0;qPts=0;
+  bal=1000;bet=0;sp=0;busy=false;$("msg").textContent="";upd();
+  show();buildFill();updTotal();renderRank();
+}
+
+openGate();
 })();
 </script>
 </body>
